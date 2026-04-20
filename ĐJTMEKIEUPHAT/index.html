@@ -81,6 +81,20 @@
           },
         },
 
+        {
+          name: "NongLam-CatTuong",
+          jsonPath: "a1cd100f-1ec8-4f45-aba2-227ee4b0d6f0.json",
+          settings: {
+            lng: 106.79026,
+            lat: 10.87337,
+            altitude: 0,
+            rotateX: 1.56,
+            rotateY: 6.05,
+            rotateZ: 0,
+            scale: 0.0008,
+          },
+        },
+
         // ── TEMPLATE ─────────────────────────────────────────────
         // {
         //     name:    'TÊN MODEL',
@@ -247,9 +261,13 @@
             if (cfg.name === "UIT-E") {
               ambientIntensity = 0.8; // Tăng sáng nền cho model tối
               directIntensity = 0.4;
-            } else if (cfg.name === "BK") {
+              } else if (cfg.name === "BK") {
               ambientIntensity = 0.6; // Giảm sáng nền để tránh chói
               directIntensity = 0.7; // Giảm ánh sáng trực tiếp
+              } else if (cfg.name === "NongLam-CatTuong") {
+                // Default darker lighting for this model
+                ambientIntensity = 0.8;
+                directIntensity = 0.8;
             }
 
             const ambientLight = new THREE.AmbientLight(0xffffff, ambientIntensity);
