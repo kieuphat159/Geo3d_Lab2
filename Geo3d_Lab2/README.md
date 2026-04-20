@@ -1,4 +1,4 @@
-# Geo3d_Lab3 — Hướng dẫn sử dụng
+# Geo3d_Lab2 — Hướng dẫn sử dụng
 
 Hướng dẫn ngắn để chuyển model từ SketchUp sang JSON và dùng trong project này.
 
