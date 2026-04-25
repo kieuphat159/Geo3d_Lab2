@@ -1,450 +1,522 @@
 <!doctype html>
 <html lang="vi">
-  <head>
-    <meta charset="utf-8" />
-    <title>3D Models - GEO3D Lab</title>
-    <meta
-      name="viewport"
-      content="initial-scale=1,maximum-scale=1,user-scalable=no"
-    />
+        <head>
+                <meta charset="utf-8" />
+                <title>3D Models - GEO3D Lab</title>
+                <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
 
-    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
-    <link
-      href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css"
-      rel="stylesheet"
-    />
-    <script src="https://unpkg.com/three@0.147.0/build/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
+                <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+                <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+                <script src="https://unpkg.com/three@0.147.0/build/three.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
 
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-      }
-      #map {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 100%;
-      }
-      .dg.ac {
-        z-index: 999 !important;
-      }
-      #debug {
-        position: absolute;
-        bottom: 10px;
-        left: 10px;
-        background: rgba(0, 0, 0, 0.75);
-        color: #0f0;
-        font: 12px monospace;
-        padding: 10px 14px;
-        border-radius: 6px;
-        z-index: 999;
-        white-space: pre;
-        pointer-events: none;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="map"></div>
-    <div id="debug">Đang tải...</div>
-    <script>
-      // ============================================================
-      //  DANH SÁCH MODELS
-      // ============================================================
-      const MODEL_LIST = [
-        {
-          name: "BK",
-          jsonPath: "db1ff9eb-9874-44e2-a396-3fba7ea6e59f.json",
-          settings: {
-            lng: 106.80250000000001,
-            lat: 10.879000000000001,
-            altitude: 0,
-            rotateX: 1.56,
-            rotateY: 5.71,
-            rotateZ: 0,
-            scale: 0.001,
-          },
-        },
+                <style>
+                        body {
+                                margin: 0;
+                                padding: 0;
+                        }
+                        #map {
+                                position: absolute;
+                                top: 0;
+                                bottom: 0;
+                                width: 100%;
+                        }
+                        .dg.ac {
+                                z-index: 999 !important;
+                        }
+                        #debug {
+                                position: absolute;
+                                bottom: 10px;
+                                left: 10px;
+                                background: rgba(0, 0, 0, 0.75);
+                                color: #0f0;
+                                font: 12px monospace;
+                                padding: 10px 14px;
+                                border-radius: 6px;
+                                z-index: 999;
+                                white-space: pre;
+                                pointer-events: none;
+                        }
+                </style>
+        </head>
+        <body>
+                <div id="map"></div>
+                <div id="debug">Đang tải...</div>
+                <script>
+                        // ============================================================
+                        //  DANH SÁCH MODELS
+                        // ============================================================
+                        const MODEL_LIST = [
+                                {
+                                        name: "BK",
+                                        jsonPath: "db1ff9eb-9874-44e2-a396-3fba7ea6e59f.json",
+                                        settings: {
+                                                lng: 106.80250000000001,
+                                                lat: 10.879000000000001,
+                                                altitude: 0,
+                                                rotateX: 1.56,
+                                                rotateY: 5.71,
+                                                rotateZ: 0,
+                                                scale: 0.001,
+                                        },
+                                },
 
-        {
-          name: "UIT-E",
-          jsonPath: "fe3328c6-39e7-4503-ba54-2b16bd3c8102.json",
-          settings: {
-            lng: 106.80265000000001,
-            lat: 10.869900000000001,
-            altitude: 0,
-            rotateX: 1.6,
-            rotateY: 1.64,
-            rotateZ: 0,
-            scale: 0.02,
-          },
-        },
+                                {
+                                        name: "UIT-E",
+                                        jsonPath: "fe3328c6-39e7-4503-ba54-2b16bd3c8102.json",
+                                        settings: {
+                                                lng: 106.80265000000001,
+                                                lat: 10.869900000000001,
+                                                altitude: 0,
+                                                rotateX: 1.6,
+                                                rotateY: 1.64,
+                                                rotateZ: 0,
+                                                scale: 0.02,
+                                        },
+                                },
 
-        {
-          name: "NongLam-CatTuong",
-          jsonPath: "a1cd100f-1ec8-4f45-aba2-227ee4b0d6f0.json",
-          settings: {
-            lng: 106.79026,
-            lat: 10.87337,
-            altitude: 0,
-            rotateX: 1.56,
-            rotateY: 6.05,
-            rotateZ: 0,
-            scale: 0.0008,
-          },
-        },
+                                {
+                                        name: "NongLam-CatTuong",
+                                        jsonPath: "a1cd100f-1ec8-4f45-aba2-227ee4b0d6f0.json",
+                                        settings: {
+                                                lng: 106.79026,
+                                                lat: 10.87337,
+                                                altitude: 0,
+                                                rotateX: 1.56,
+                                                rotateY: 6.05,
+                                                rotateZ: 0,
+                                                scale: 0.0008,
+                                        },
+                                },
 
-        // ── TEMPLATE ─────────────────────────────────────────────
-        // {
-        //     name:    'TÊN MODEL',
-        //     jsonPath: 'FILE.json',
-        //     settings: {
-        //         lng:      106.8025,
-        //         lat:       10.8791,
-        //         altitude:   0,
-        //         rotateX:    1.6,
-        //         rotateY:    5.7,
-        //         rotateZ:    0,
-        //         scale:      0.001
-        //     }
-        // },
-        // ─────────────────────────────────────────────────────────
-      ];
-      // ============================================================
+                                {
+                                        name: "KHTN",
+                                        jsonPath: "6ffc3d7e-7a4b-424d-bff5-fae455334095.json",
+                                        settings: {
+                                                lng: 106.79508,
+                                                lat: 10.87961,
+                                                altitude: 0,
+                                                rotateX: 1.54,
+                                                rotateY: 6.28,
+                                                rotateZ: 0,
+                                                scale: 0.0227,
+                                                ambientIntensity: 0.2,
+                                                directIntensity: 1,
+                                        },
+                                },
 
-      const debugEl = document.getElementById("debug");
-      function updateDebug(lines) {
-        debugEl.textContent = lines.join("\n");
-      }
+                                {
+                                        name: "NongLam-HuongDuong",
+                                        jsonPath: "a1cd100f-1ec8-4f45-aba2-227ee4b0d6f1.json",
+                                        settings: {
+                                                lng: 106.79026,
+                                                lat: 10.87366,
+                                                altitude: 0,
+                                                rotateX: 1.56,
+                                                rotateY: 6.05,
+                                                rotateZ: 0,
+                                                scale: 0.0008,
+                                                ambientIntensity: 0.8,
+                                                directIntensity: 0.8,
+                                        },
+                                },
 
-      // ============================================================
-      //  JSON 3D MODEL LOADER
-      // ============================================================
-      class JSONModelLoader {
-        async loadJSON(path) {
-          const response = await fetch(path);
-          if (!response.ok) throw new Error(`Failed to load JSON: ${path}`);
-          return await response.json();
-        }
+                                {
+                                        name: "VienKhoaHocSucKhoe",
+                                        jsonPath: "3dad4455-53e5-4bf7-a10d-02ee778d038c.json",
+                                        settings: {
+                                                lng: 106.78958,
+                                                lat: 10.87196,
+                                                altitude: 0,
+                                                rotateX: 1.58,
+                                                rotateY: 4.01,
+                                                rotateZ: 0,
+                                                scale: 0.031,
+                                                ambientIntensity: 0.8,
+                                                directIntensity: 2.3,
+                                        },
+                                },
 
-        createGeometry(data) {
-          const geometry = new THREE.BufferGeometry();
+                                // ── TEMPLATE ─────────────────────────────────────────────
+                                // {
+                                //     name:    'TÊN MODEL',
+                                //     jsonPath: 'FILE.json',
+                                //     settings: {
+                                //         lng:      106.8025,
+                                //         lat:       10.8791,
+                                //         altitude:   0,
+                                //         rotateX:    1.6,
+                                //         rotateY:    5.7,
+                                //         rotateZ:    0,
+                                //         scale:      0.001
+                                //     }
+                                // },
+                                // ─────────────────────────────────────────────────────────
+                        ];
+                        // ============================================================
 
-          // Thêm vertices
-          const vertices = new Float32Array(data.vertices.length * 3);
-          data.vertices.forEach((v, i) => {
-            vertices[i * 3] = v.x;
-            vertices[i * 3 + 1] = v.y;
-            vertices[i * 3 + 2] = v.z;
-          });
-          geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
+                        const debugEl = document.getElementById("debug");
+                        function updateDebug(lines) {
+                                debugEl.textContent = lines.join("\n");
+                        }
 
-          // Thêm normals nếu có
-          if (data.normals && data.normals.length > 0) {
-            const normals = new Float32Array(data.vertices.length * 3);
-            data.normals.forEach((n, i) => {
-              if (i < data.vertices.length) {
-                normals[i * 3] = n.x;
-                normals[i * 3 + 1] = n.y;
-                normals[i * 3 + 2] = n.z;
-              }
-            });
-            geometry.setAttribute("normal", new THREE.BufferAttribute(normals, 3));
-          } else {
-            geometry.computeVertexNormals();
-          }
+                        // ============================================================
+                        //  JSON 3D MODEL LOADER
+                        // ============================================================
+                        class JSONModelLoader {
+                                async loadJSON(path) {
+                                        const response = await fetch(path);
+                                        if (!response.ok) throw new Error(`Failed to load JSON: ${path}`);
+                                        return await response.json();
+                                }
 
-          // Build indices grouped by material so we can use multiple materials
-          const materialNames = Array.from(new Set(data.faces.map((f) => f.material || 'default')));
-          const matIndexMap = {};
-          materialNames.forEach((name, i) => (matIndexMap[name] = i));
+                                createGeometry(data) {
+                                        const geometry = new THREE.BufferGeometry();
 
-          const indicesPerMat = materialNames.map(() => []);
-          data.faces.forEach((face) => {
-            const mIndex = matIndexMap[face.material || 'default'];
-            if (face.vertices && face.vertices.length >= 3) {
-              for (let i = 1; i < face.vertices.length - 1; i++) {
-                indicesPerMat[mIndex].push(face.vertices[0]);
-                indicesPerMat[mIndex].push(face.vertices[i]);
-                indicesPerMat[mIndex].push(face.vertices[i + 1]);
-              }
-            }
-          });
+                                        // Thêm vertices
+                                        const vertices = new Float32Array(data.vertices.length * 3);
+                                        data.vertices.forEach((v, i) => {
+                                                vertices[i * 3] = v.x;
+                                                vertices[i * 3 + 1] = v.y;
+                                                vertices[i * 3 + 2] = v.z;
+                                        });
+                                        geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
 
-          // Concatenate indices and add groups
-          let total = [];
-          let offset = 0;
-          indicesPerMat.forEach((arr, matIdx) => {
-            if (arr.length > 0) {
-              total = total.concat(arr);
-              geometry.addGroup(offset, arr.length, matIdx);
-              offset += arr.length;
-            }
-          });
+                                        // Thêm normals nếu có
+                                        if (data.normals && data.normals.length > 0) {
+                                                const normals = new Float32Array(data.vertices.length * 3);
+                                                data.normals.forEach((n, i) => {
+                                                        if (i < data.vertices.length) {
+                                                                normals[i * 3] = n.x;
+                                                                normals[i * 3 + 1] = n.y;
+                                                                normals[i * 3 + 2] = n.z;
+                                                        }
+                                                });
+                                                geometry.setAttribute("normal", new THREE.BufferAttribute(normals, 3));
+                                        } else {
+                                                geometry.computeVertexNormals();
+                                        }
 
-          if (total.length > 0) {
-            geometry.setIndex(new THREE.BufferAttribute(new Uint32Array(total), 1));
-          }
+                                        // Build indices grouped by material so we can use multiple materials
+                                        const materialNames = Array.from(
+                                                new Set(data.faces.map((f) => f.material || "default")),
+                                        );
+                                        const matIndexMap = {};
+                                        materialNames.forEach((name, i) => (matIndexMap[name] = i));
 
-          return { geometry, materialNames };
-        }
+                                        const indicesPerMat = materialNames.map(() => []);
+                                        data.faces.forEach((face) => {
+                                                const mIndex = matIndexMap[face.material || "default"];
+                                                if (face.vertices && face.vertices.length >= 3) {
+                                                        for (let i = 1; i < face.vertices.length - 1; i++) {
+                                                                indicesPerMat[mIndex].push(face.vertices[0]);
+                                                                indicesPerMat[mIndex].push(face.vertices[i]);
+                                                                indicesPerMat[mIndex].push(face.vertices[i + 1]);
+                                                        }
+                                                }
+                                        });
 
-        async load(path) {
-          const data = await this.loadJSON(path);
-          const result = this.createGeometry(data);
-          const geometry = result.geometry;
-          const materialNames = result.materialNames || ['default'];
+                                        // Concatenate indices and add groups
+                                        let total = [];
+                                        let offset = 0;
+                                        indicesPerMat.forEach((arr, matIdx) => {
+                                                if (arr.length > 0) {
+                                                        total = total.concat(arr);
+                                                        geometry.addGroup(offset, arr.length, matIdx);
+                                                        offset += arr.length;
+                                                }
+                                        });
 
-          // Build materials array from data.material_props
-          const materials = materialNames.map((name) => {
-            const props = (data.material_props && data.material_props[name]) || {};
-            let color = 0x888888;
-            if (props.Kd) {
-              const r = Math.min(1, Math.max(0, props.Kd[0]));
-              const g = Math.min(1, Math.max(0, props.Kd[1]));
-              const b = Math.min(1, Math.max(0, props.Kd[2]));
-              color = (Math.round(r * 255) << 16) | (Math.round(g * 255) << 8) | Math.round(b * 255);
-            }
-            const matOpts = { color, side: THREE.DoubleSide, flatShading: true };
-            // texture map_Kd handling could be added here (needs loading)
-            return new THREE.MeshPhongMaterial(matOpts);
-          });
+                                        if (total.length > 0) {
+                                                geometry.setIndex(new THREE.BufferAttribute(new Uint32Array(total), 1));
+                                        }
 
-          // If only one material, pass that; else pass array so groups map to materials
-          const mesh = new THREE.Mesh(geometry, materials.length === 1 ? materials[0] : materials);
-          return mesh;
-        }
-      }
+                                        return { geometry, materialNames };
+                                }
 
-      const jsonLoader = new JSONModelLoader();
+                                async load(path) {
+                                        const data = await this.loadJSON(path);
+                                        const result = this.createGeometry(data);
+                                        const geometry = result.geometry;
+                                        const materialNames = result.materialNames || ["default"];
 
-      const centerLng =
-        MODEL_LIST.reduce((s, m) => s + m.settings.lng, 0) / MODEL_LIST.length;
-      const centerLat =
-        MODEL_LIST.reduce((s, m) => s + m.settings.lat, 0) / MODEL_LIST.length;
+                                        // Build materials array from data.material_props
+                                        const materials = materialNames.map((name) => {
+                                                const props = (data.material_props && data.material_props[name]) || {};
+                                                let color = 0x888888;
+                                                if (props.Kd) {
+                                                        const r = Math.min(1, Math.max(0, props.Kd[0]));
+                                                        const g = Math.min(1, Math.max(0, props.Kd[1]));
+                                                        const b = Math.min(1, Math.max(0, props.Kd[2]));
+                                                        color =
+                                                                (Math.round(r * 255) << 16) |
+                                                                (Math.round(g * 255) << 8) |
+                                                                Math.round(b * 255);
+                                                }
+                                                const matOpts = { color, side: THREE.DoubleSide, flatShading: true };
+                                                // texture map_Kd handling could be added here (needs loading)
+                                                return new THREE.MeshPhongMaterial(matOpts);
+                                        });
 
-      const map = new maplibregl.Map({
-        container: "map",
-        style:
-          "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
-        center: [centerLng, centerLat],
-        zoom: 17,
-        pitch: 60,
-        antialias: true,
-      });
+                                        // If only one material, pass that; else pass array so groups map to materials
+                                        const mesh = new THREE.Mesh(
+                                                geometry,
+                                                materials.length === 1 ? materials[0] : materials,
+                                        );
+                                        return mesh;
+                                }
+                        }
 
-      const entries = [];
+                        const jsonLoader = new JSONModelLoader();
 
-      const masterLayer = {
-        id: "3d-models",
-        type: "custom",
-        renderingMode: "3d",
+                        const centerLng = MODEL_LIST.reduce((s, m) => s + m.settings.lng, 0) / MODEL_LIST.length;
+                        const centerLat = MODEL_LIST.reduce((s, m) => s + m.settings.lat, 0) / MODEL_LIST.length;
 
-        onAdd(map, gl) {
-          this.camera = new THREE.Camera();
-          this.renderer = new THREE.WebGLRenderer({
-            canvas: map.getCanvas(),
-            context: gl,
-            antialias: true,
-          });
-          this.renderer.autoClear = false;
+                        const map = new maplibregl.Map({
+                                container: "map",
+                                style: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
+                                center: [centerLng, centerLat],
+                                zoom: 17,
+                                pitch: 60,
+                                antialias: true,
+                        });
 
-          MODEL_LIST.forEach((cfg) => {
-            const s = cfg.settings;
-            const scene = new THREE.Scene();
+                        const entries = [];
 
-            // Tùy chỉnh ánh sáng dựa trên tên model
-            let ambientIntensity = 2;
-            let directIntensity = 2;
+                        const masterLayer = {
+                                id: "3d-models",
+                                type: "custom",
+                                renderingMode: "3d",
 
-            if (cfg.name === "UIT-E") {
-              ambientIntensity = 0.8; // Tăng sáng nền cho model tối
-              directIntensity = 0.4;
-              } else if (cfg.name === "BK") {
-              ambientIntensity = 0.6; // Giảm sáng nền để tránh chói
-              directIntensity = 0.7; // Giảm ánh sáng trực tiếp
-              } else if (cfg.name === "NongLam-CatTuong") {
-                // Default darker lighting for this model
-                ambientIntensity = 0.8;
-                directIntensity = 0.8;
-            }
+                                onAdd(map, gl) {
+                                        this.camera = new THREE.Camera();
+                                        this.renderer = new THREE.WebGLRenderer({
+                                                canvas: map.getCanvas(),
+                                                context: gl,
+                                                antialias: true,
+                                        });
+                                        this.renderer.autoClear = false;
 
-            const ambientLight = new THREE.AmbientLight(0xffffff, ambientIntensity);
-            scene.add(ambientLight);
+                                        MODEL_LIST.forEach((cfg) => {
+                                                const s = cfg.settings;
+                                                const scene = new THREE.Scene();
 
-            const directionalLight = new THREE.DirectionalLight(0xffffff, directIntensity);
-            directionalLight.position.set(0, -70, 100).normalize();
-            scene.add(directionalLight);
+                                                // Tùy chỉnh ánh sáng dựa trên tên model
+                                                let ambientIntensity = s.ambientIntensity ?? 2;
+                                                let directIntensity = s.directIntensity ?? 2;
 
-            const entry = {
-              scene,
-              settings: s,
-              mesh: null,
-              mercator: maplibregl.MercatorCoordinate.fromLngLat(
-                [s.lng, s.lat],
-                s.altitude,
-              ),
-            };
+                                                if (cfg.name === "UIT-E") {
+                                                        ambientIntensity = 0.8; // Tăng sáng nền cho model tối
+                                                        directIntensity = 0.4;
+                                                } else if (cfg.name === "BK") {
+                                                        ambientIntensity = 0.6; // Giảm sáng nền để tránh chói
+                                                        directIntensity = 0.7; // Giảm ánh sáng trực tiếp
+                                                } else if (cfg.name === "NongLam-CatTuong") {
+                                                        // Default darker lighting for this model
+                                                        ambientIntensity = 0.8;
+                                                        directIntensity = 0.8;
+                                                }
 
-            // expose lights and initial intensities for per-model control
-            s.ambientIntensity = ambientIntensity;
-            s.directIntensity = directIntensity;
-            entry.ambientLight = ambientLight;
-            entry.directionalLight = directionalLight;
+                                                const ambientLight = new THREE.AmbientLight(0xffffff, ambientIntensity);
+                                                scene.add(ambientLight);
 
-            entry.refreshMercator = function () {
-              this.mercator = maplibregl.MercatorCoordinate.fromLngLat(
-                [s.lng, s.lat],
-                s.altitude,
-              );
-            };
+                                                const directionalLight = new THREE.DirectionalLight(
+                                                        0xffffff,
+                                                        directIntensity,
+                                                );
+                                                directionalLight.position.set(0, -70, 100).normalize();
+                                                scene.add(directionalLight);
 
-            // ── Tải JSON model ──
-            jsonLoader
-              .load(cfg.jsonPath)
-              .then((mesh) => {
-                entry.mesh = mesh;
-                scene.add(mesh);
+                                                const entry = {
+                                                        scene,
+                                                        settings: s,
+                                                        mesh: null,
+                                                        mercator: maplibregl.MercatorCoordinate.fromLngLat(
+                                                                [s.lng, s.lat],
+                                                                s.altitude,
+                                                        ),
+                                                };
 
-                // ── Tính bounding box thực tế của model ──
-                const box = new THREE.Box3().setFromObject(mesh);
-                const size = new THREE.Vector3();
-                const center = new THREE.Vector3();
-                box.getSize(size);
-                box.getCenter(center);
+                                                // expose lights and initial intensities for per-model control
+                                                s.ambientIntensity = ambientIntensity;
+                                                s.directIntensity = directIntensity;
+                                                entry.ambientLight = ambientLight;
+                                                entry.directionalLight = directionalLight;
 
-                console.log(`[${cfg.name}] Bounding box size:`, size);
-                console.log(`[${cfg.name}] Bounding box center:`, center);
-                console.log(`[${cfg.name}] Min:`, box.min, "| Max:", box.max);
-                console.log(`[${cfg.name}] Loaded from JSON: ${cfg.jsonPath}`);
+                                                entry.refreshMercator = function () {
+                                                        this.mercator = maplibregl.MercatorCoordinate.fromLngLat(
+                                                                [s.lng, s.lat],
+                                                                s.altitude,
+                                                        );
+                                                };
 
-                entry.debugInfo = {
-                  size: `x=${size.x.toFixed(2)}  y=${size.y.toFixed(2)}  z=${size.z.toFixed(2)}`,
-                  center: `x=${center.x.toFixed(2)}  y=${center.y.toFixed(2)}  z=${center.z.toFixed(2)}`,
-                };
-                const allLines = [
-                  "=== DEBUG: Kích thước model (đơn vị JSON) ===",
-                  "",
-                ];
-                entries.forEach((e, i) => {
-                  if (e.debugInfo) {
-                    allLines.push(`── ${MODEL_LIST[i].name} ──`);
-                    allLines.push(`Size  : ${e.debugInfo.size}`);
-                    allLines.push(`Center: ${e.debugInfo.center}`);
-                    allLines.push("");
-                  }
-                });
-                allLines.push("(Xem Console F12 để biết thêm chi tiết)");
-                updateDebug(allLines);
-              })
-              .catch((err) => {
-                console.error(`[${cfg.name}] Lỗi tải JSON:`, err);
-                updateDebug([`❌ Lỗi tải model ${cfg.name}:`, err.message]);
-              });
+                                                // ── Tải JSON model ──
+                                                jsonLoader
+                                                        .load(cfg.jsonPath)
+                                                        .then((mesh) => {
+                                                                entry.mesh = mesh;
+                                                                scene.add(mesh);
 
-            entries.push(entry);
-          });
+                                                                // ── Tính bounding box thực tế của model ──
+                                                                const box = new THREE.Box3().setFromObject(mesh);
+                                                                const size = new THREE.Vector3();
+                                                                const center = new THREE.Vector3();
+                                                                box.getSize(size);
+                                                                box.getCenter(center);
 
-          this.map = map;
-        },
+                                                                console.log(`[${cfg.name}] Bounding box size:`, size);
+                                                                console.log(
+                                                                        `[${cfg.name}] Bounding box center:`,
+                                                                        center,
+                                                                );
+                                                                console.log(
+                                                                        `[${cfg.name}] Min:`,
+                                                                        box.min,
+                                                                        "| Max:",
+                                                                        box.max,
+                                                                );
+                                                                console.log(
+                                                                        `[${cfg.name}] Loaded from JSON: ${cfg.jsonPath}`,
+                                                                );
 
-        render(gl, matrix) {
-          entries.forEach((entry) => {
-            const s = entry.settings;
-            const mc = entry.mercator;
+                                                                entry.debugInfo = {
+                                                                        size: `x=${size.x.toFixed(2)}  y=${size.y.toFixed(2)}  z=${size.z.toFixed(2)}`,
+                                                                        center: `x=${center.x.toFixed(2)}  y=${center.y.toFixed(2)}  z=${center.z.toFixed(2)}`,
+                                                                };
+                                                                const allLines = [
+                                                                        "=== DEBUG: Kích thước model (đơn vị JSON) ===",
+                                                                        "",
+                                                                ];
+                                                                entries.forEach((e, i) => {
+                                                                        if (e.debugInfo) {
+                                                                                allLines.push(
+                                                                                        `── ${MODEL_LIST[i].name} ──`,
+                                                                                );
+                                                                                allLines.push(
+                                                                                        `Size  : ${e.debugInfo.size}`,
+                                                                                );
+                                                                                allLines.push(
+                                                                                        `Center: ${e.debugInfo.center}`,
+                                                                                );
+                                                                                allLines.push("");
+                                                                        }
+                                                                });
+                                                                allLines.push(
+                                                                        "(Xem Console F12 để biết thêm chi tiết)",
+                                                                );
+                                                                updateDebug(allLines);
+                                                        })
+                                                        .catch((err) => {
+                                                                console.error(`[${cfg.name}] Lỗi tải JSON:`, err);
+                                                                updateDebug([
+                                                                        `❌ Lỗi tải model ${cfg.name}:`,
+                                                                        err.message,
+                                                                ]);
+                                                        });
 
-            if (entry.mesh) {
-              entry.mesh.scale.set(s.scale, s.scale, s.scale);
-            }
+                                                entries.push(entry);
+                                        });
 
-            const rotationX = new THREE.Matrix4().makeRotationAxis(
-              new THREE.Vector3(1, 0, 0),
-              s.rotateX,
-            );
-            const rotationY = new THREE.Matrix4().makeRotationAxis(
-              new THREE.Vector3(0, 1, 0),
-              s.rotateY,
-            );
-            const rotationZ = new THREE.Matrix4().makeRotationAxis(
-              new THREE.Vector3(0, 0, 1),
-              s.rotateZ,
-            );
+                                        this.map = map;
+                                },
 
-            const m = new THREE.Matrix4().fromArray(matrix);
-            const l = new THREE.Matrix4()
-              .makeTranslation(mc.x, mc.y, mc.z)
-              .scale(
-                new THREE.Vector3(
-                  mc.meterInMercatorCoordinateUnits(),
-                  -mc.meterInMercatorCoordinateUnits(),
-                  mc.meterInMercatorCoordinateUnits(),
-                ),
-              )
-              .multiply(rotationX)
-              .multiply(rotationY)
-              .multiply(rotationZ);
+                                render(gl, matrix) {
+                                        entries.forEach((entry) => {
+                                                const s = entry.settings;
+                                                const mc = entry.mercator;
 
-            this.camera.projectionMatrix = m.multiply(l);
-            this.renderer.resetState();
-            this.renderer.render(entry.scene, this.camera);
-          });
+                                                if (entry.mesh) {
+                                                        entry.mesh.scale.set(s.scale, s.scale, s.scale);
+                                                }
 
-          this.map.triggerRepaint();
-        },
-      };
+                                                const rotationX = new THREE.Matrix4().makeRotationAxis(
+                                                        new THREE.Vector3(1, 0, 0),
+                                                        s.rotateX,
+                                                );
+                                                const rotationY = new THREE.Matrix4().makeRotationAxis(
+                                                        new THREE.Vector3(0, 1, 0),
+                                                        s.rotateY,
+                                                );
+                                                const rotationZ = new THREE.Matrix4().makeRotationAxis(
+                                                        new THREE.Vector3(0, 0, 1),
+                                                        s.rotateZ,
+                                                );
 
-      map.on("load", () => {
-        map.addLayer(masterLayer);
+                                                const m = new THREE.Matrix4().fromArray(matrix);
+                                                const l = new THREE.Matrix4()
+                                                        .makeTranslation(mc.x, mc.y, mc.z)
+                                                        .scale(
+                                                                new THREE.Vector3(
+                                                                        mc.meterInMercatorCoordinateUnits(),
+                                                                        -mc.meterInMercatorCoordinateUnits(),
+                                                                        mc.meterInMercatorCoordinateUnits(),
+                                                                ),
+                                                        )
+                                                        .multiply(rotationX)
+                                                        .multiply(rotationY)
+                                                        .multiply(rotationZ);
 
-        const gui = new dat.GUI({ width: 300 });
+                                                this.camera.projectionMatrix = m.multiply(l);
+                                                this.renderer.resetState();
+                                                this.renderer.render(entry.scene, this.camera);
+                                        });
 
-        entries.forEach((entry, i) => {
-          const cfg = MODEL_LIST[i];
-          const s = entry.settings;
+                                        this.map.triggerRepaint();
+                                },
+                        };
 
-          const folder = gui.addFolder(cfg.name);
+                        map.on("load", () => {
+                                map.addLayer(masterLayer);
 
-          const posFolder = folder.addFolder("Vi tri");
-          posFolder
-            .add(s, "lng", undefined, undefined, 0.00001)
-            .name("lng")
-            .onChange(() => entry.refreshMercator());
-          posFolder
-            .add(s, "lat", undefined, undefined, 0.00001)
-            .name("lat")
-            .onChange(() => entry.refreshMercator());
-          posFolder
-            .add(s, "altitude", 0, 500, 1)
-            .name("altitude (m)")
-            .onChange(() => entry.refreshMercator());
-          posFolder.open();
+                                const gui = new dat.GUI({ width: 300 });
 
-          const rotFolder = folder.addFolder("Xoay & Ti le");
-          rotFolder.add(s, "rotateX", 0, Math.PI * 2, 0.01).name("rotateX");
-          rotFolder.add(s, "rotateY", 0, Math.PI * 2, 0.01).name("rotateY");
-          rotFolder.add(s, "rotateZ", 0, Math.PI * 2, 0.01).name("rotateZ");
-          rotFolder.add(s, "scale", 0.0001, 0.1, 0.0001).name("scale");
-          rotFolder.open();
+                                entries.forEach((entry, i) => {
+                                        const cfg = MODEL_LIST[i];
+                                        const s = entry.settings;
 
-          const lightFolder = folder.addFolder("Ánh sáng");
-          lightFolder
-            .add(s, "ambientIntensity", 0, 10, 0.1)
-            .name("Ambient")
-            .onChange((v) => {
-              if (entry.ambientLight) entry.ambientLight.intensity = v;
-            });
-          lightFolder
-            .add(s, "directIntensity", 0, 10, 0.1)
-            .name("Directional")
-            .onChange((v) => {
-              if (entry.directionalLight) entry.directionalLight.intensity = v;
-            });
-          lightFolder.open();
+                                        const folder = gui.addFolder(cfg.name);
 
-          folder.open();
-        });
-      });
-    </script>
-  </body>
+                                        const posFolder = folder.addFolder("Vi tri");
+                                        posFolder
+                                                .add(s, "lng", undefined, undefined, 0.00001)
+                                                .name("lng")
+                                                .onChange(() => entry.refreshMercator());
+                                        posFolder
+                                                .add(s, "lat", undefined, undefined, 0.00001)
+                                                .name("lat")
+                                                .onChange(() => entry.refreshMercator());
+                                        posFolder
+                                                .add(s, "altitude", 0, 500, 1)
+                                                .name("altitude (m)")
+                                                .onChange(() => entry.refreshMercator());
+                                        posFolder.open();
+
+                                        const rotFolder = folder.addFolder("Xoay & Ti le");
+                                        rotFolder.add(s, "rotateX", 0, Math.PI * 2, 0.01).name("rotateX");
+                                        rotFolder.add(s, "rotateY", 0, Math.PI * 2, 0.01).name("rotateY");
+                                        rotFolder.add(s, "rotateZ", 0, Math.PI * 2, 0.01).name("rotateZ");
+                                        rotFolder.add(s, "scale", 0.0001, 0.1, 0.0001).name("scale");
+                                        rotFolder.open();
+
+                                        const lightFolder = folder.addFolder("Ánh sáng");
+                                        lightFolder
+                                                .add(s, "ambientIntensity", 0, 10, 0.1)
+                                                .name("Ambient")
+                                                .onChange((v) => {
+                                                        if (entry.ambientLight) entry.ambientLight.intensity = v;
+                                                });
+                                        lightFolder
+                                                .add(s, "directIntensity", 0, 10, 0.1)
+                                                .name("Directional")
+                                                .onChange((v) => {
+                                                        if (entry.directionalLight)
+                                                                entry.directionalLight.intensity = v;
+                                                });
+                                        lightFolder.open();
+
+                                        folder.open();
+                                });
+                        });
+                </script>
+        </body>
 </html>
