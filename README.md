@@ -8,7 +8,7 @@ git clone https://github.com/kieuphat159/Geo3d_Lab2.git
 
 ### 2. Vào thư mục chứa index.html
 ```bash
-cd Geo#d_Lab2/Geo3d_Lab2
+cd Geo3d_Lab2/Geo3d_Lab2
 ```
 
 ### 3. Mở file trên browser và xem các models
