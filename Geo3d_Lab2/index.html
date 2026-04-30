@@ -8,7 +8,6 @@
                 <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
                 <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
                 <script src="https://unpkg.com/three@0.147.0/build/three.min.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
 
                 <style>
                         body {
@@ -21,27 +20,10 @@
                                 bottom: 0;
                                 width: 100%;
                         }
-                        .dg.ac {
-                                z-index: 999 !important;
-                        }
-                        #debug {
-                                position: absolute;
-                                bottom: 10px;
-                                left: 10px;
-                                background: rgba(0, 0, 0, 0.75);
-                                color: #0f0;
-                                font: 12px monospace;
-                                padding: 10px 14px;
-                                border-radius: 6px;
-                                z-index: 999;
-                                white-space: pre;
-                                pointer-events: none;
-                        }
                 </style>
         </head>
         <body>
                 <div id="map"></div>
-                <div id="debug">Đang tải...</div>
                 <script>
                         // ============================================================
                         //  DANH SÁCH MODELS
@@ -156,40 +138,19 @@
                                         name: "Tòa B4 KTX Khu B",
                                         jsonPath: "ktx.json",
                                         settings: {
-                                                lng: 106.78363,
-                                                lat: 10.88329,
-                                                altitude: 0,
+                                                lng: 106.78309,
+                                                lat: 10.88278,
+                                                altitude: 5,
                                                 rotateX: 1.63,
                                                 rotateY: 0.65,
                                                 rotateZ: 0,
-                                                scale: 20,
-                                                ambientIntensity: 1,
+                                                scale: 10,
+                                                ambientIntensity: 0.5,
                                                 directIntensity: 1.3,
                                         },
                                 },
-
-                                // ── TEMPLATE ─────────────────────────────────────────────
-                                // {
-                                //     name:    'TÊN MODEL',
-                                //     jsonPath: 'FILE.json',
-                                //     settings: {
-                                //         lng:      106.8025,
-                                //         lat:       10.8791,
-                                //         altitude:   0,
-                                //         rotateX:    1.6,
-                                //         rotateY:    5.7,
-                                //         rotateZ:    0,
-                                //         scale:      0.001
-                                //     }
-                                // },
-                                // ─────────────────────────────────────────────────────────
                         ];
                         // ============================================================
-
-                        const debugEl = document.getElementById("debug");
-                        function updateDebug(lines) {
-                                debugEl.textContent = lines.join("\n");
-                        }
 
                         // ============================================================
                         //  JSON 3D MODEL LOADER
@@ -204,7 +165,6 @@
                                 createGeometryClassic(data) {
                                         const geometry = new THREE.BufferGeometry();
 
-                                        // Thêm vertices
                                         const vertices = new Float32Array(data.vertices.length * 3);
                                         data.vertices.forEach((v, i) => {
                                                 vertices[i * 3] = v.x;
@@ -213,7 +173,6 @@
                                         });
                                         geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
 
-                                        // Thêm normals nếu có
                                         if (data.normals && data.normals.length > 0) {
                                                 const normals = new Float32Array(data.vertices.length * 3);
                                                 data.normals.forEach((n, i) => {
@@ -228,7 +187,6 @@
                                                 geometry.computeVertexNormals();
                                         }
 
-                                        // Build indices grouped by material so we can use multiple materials
                                         const materialNames = Array.from(
                                                 new Set(data.faces.map((f) => f.material || "default")),
                                         );
@@ -247,7 +205,6 @@
                                                 }
                                         });
 
-                                        // Concatenate indices and add groups
                                         let total = [];
                                         let offset = 0;
                                         indicesPerMat.forEach((arr, matIdx) => {
@@ -262,160 +219,158 @@
                                                 geometry.setIndex(new THREE.BufferAttribute(new Uint32Array(total), 1));
                                         }
 
-                    return { geometry, materialNames };
-                }
+                                        return { geometry, materialNames };
+                                }
 
-                createGeometry(data) {
-                    const geometry = new THREE.BufferGeometry();
+                                createGeometry(data) {
+                                        const geometry = new THREE.BufferGeometry();
 
-                    const materialNames = Array.from(new Set(data.faces.map((f) => f.material || "default")));
-                    const matIndexMap = {};
-                    materialNames.forEach((name, i) => (matIndexMap[name] = i));
+                                        const materialNames = Array.from(new Set(data.faces.map((f) => f.material || "default")));
+                                        const matIndexMap = {};
+                                        materialNames.forEach((name, i) => (matIndexMap[name] = i));
 
-                    const dedupMap = new Map();
-                    const outPositions = [];
-                    const outNormals = [];
-                    const outUvs = [];
-                    let hasAnyNormal = false;
-                    let hasAnyUv = false;
+                                        const dedupMap = new Map();
+                                        const outPositions = [];
+                                        const outNormals = [];
+                                        const outUvs = [];
+                                        let hasAnyNormal = false;
+                                        let hasAnyUv = false;
 
-                    function getOrCreateVertex(vIdx, vtIdx, vnIdx) {
-                        const key = `${vIdx}/${vtIdx ?? -1}/${vnIdx ?? -1}`;
-                        if (dedupMap.has(key)) return dedupMap.get(key);
+                                        function getOrCreateVertex(vIdx, vtIdx, vnIdx) {
+                                                const key = `${vIdx}/${vtIdx ?? -1}/${vnIdx ?? -1}`;
+                                                if (dedupMap.has(key)) return dedupMap.get(key);
 
-                        const sourceVertex = data.vertices[vIdx] || { x: 0, y: 0, z: 0 };
-                        outPositions.push(sourceVertex.x, sourceVertex.y, sourceVertex.z);
+                                                const sourceVertex = data.vertices[vIdx] || { x: 0, y: 0, z: 0 };
+                                                outPositions.push(sourceVertex.x, sourceVertex.y, sourceVertex.z);
 
-                        const sourceNormal = vnIdx != null && data.normals && data.normals[vnIdx] ? data.normals[vnIdx] : null;
-                        if (sourceNormal) {
-                            outNormals.push(sourceNormal.x, sourceNormal.y, sourceNormal.z);
-                            hasAnyNormal = true;
-                        } else {
-                            outNormals.push(0, 0, 0);
-                        }
+                                                const sourceNormal = vnIdx != null && data.normals && data.normals[vnIdx] ? data.normals[vnIdx] : null;
+                                                if (sourceNormal) {
+                                                        outNormals.push(sourceNormal.x, sourceNormal.y, sourceNormal.z);
+                                                        hasAnyNormal = true;
+                                                } else {
+                                                        outNormals.push(0, 0, 0);
+                                                }
 
-                        const sourceUv = vtIdx != null && data.textures && data.textures[vtIdx] ? data.textures[vtIdx] : null;
-                        if (sourceUv) {
-                            outUvs.push(sourceUv.u, sourceUv.v);
-                            hasAnyUv = true;
-                        } else {
-                            outUvs.push(0, 0);
-                        }
+                                                const sourceUv = vtIdx != null && data.textures && data.textures[vtIdx] ? data.textures[vtIdx] : null;
+                                                if (sourceUv) {
+                                                        outUvs.push(sourceUv.u, sourceUv.v);
+                                                        hasAnyUv = true;
+                                                } else {
+                                                        outUvs.push(0, 0);
+                                                }
 
-                        const createdIndex = outPositions.length / 3 - 1;
-                        dedupMap.set(key, createdIndex);
-                        return createdIndex;
-                    }
+                                                const createdIndex = outPositions.length / 3 - 1;
+                                                dedupMap.set(key, createdIndex);
+                                                return createdIndex;
+                                        }
 
-                    const indicesPerMat = materialNames.map(() => []);
-                    data.faces.forEach((face) => {
-                        const mIndex = matIndexMap[face.material || "default"];
-                        const faceVertices = face.vertices || [];
-                        if (faceVertices.length < 3) return;
+                                        const indicesPerMat = materialNames.map(() => []);
+                                        data.faces.forEach((face) => {
+                                                const mIndex = matIndexMap[face.material || "default"];
+                                                const faceVertices = face.vertices || [];
+                                                if (faceVertices.length < 3) return;
 
-                        for (let i = 1; i < faceVertices.length - 1; i++) {
-                            const tri = [0, i, i + 1];
-                            tri.forEach((corner) => {
-                                const vIdx = faceVertices[corner];
-                                const vtIdx = face.textures && face.textures.length > corner ? face.textures[corner] : null;
-                                const vnIdx = face.normals && face.normals.length > corner ? face.normals[corner] : null;
-                                const idx = getOrCreateVertex(vIdx, vtIdx, vnIdx);
-                                indicesPerMat[mIndex].push(idx);
-                            });
-                        }
-                    });
+                                                for (let i = 1; i < faceVertices.length - 1; i++) {
+                                                        const tri = [0, i, i + 1];
+                                                        tri.forEach((corner) => {
+                                                                const vIdx = faceVertices[corner];
+                                                                const vtIdx = face.textures && face.textures.length > corner ? face.textures[corner] : null;
+                                                                const vnIdx = face.normals && face.normals.length > corner ? face.normals[corner] : null;
+                                                                const idx = getOrCreateVertex(vIdx, vtIdx, vnIdx);
+                                                                indicesPerMat[mIndex].push(idx);
+                                                        });
+                                                }
+                                        });
 
-                    geometry.setAttribute("position", new THREE.BufferAttribute(new Float32Array(outPositions), 3));
-                    if (hasAnyUv) {
-                        geometry.setAttribute("uv", new THREE.BufferAttribute(new Float32Array(outUvs), 2));
-                    }
+                                        geometry.setAttribute("position", new THREE.BufferAttribute(new Float32Array(outPositions), 3));
+                                        if (hasAnyUv) {
+                                                geometry.setAttribute("uv", new THREE.BufferAttribute(new Float32Array(outUvs), 2));
+                                        }
 
-                    let total = [];
-                    let offset = 0;
-                    indicesPerMat.forEach((arr, matIdx) => {
-                        if (arr.length > 0) {
-                            total = total.concat(arr);
-                            geometry.addGroup(offset, arr.length, matIdx);
-                            offset += arr.length;
-                        }
-                    });
+                                        let total = [];
+                                        let offset = 0;
+                                        indicesPerMat.forEach((arr, matIdx) => {
+                                                if (arr.length > 0) {
+                                                        total = total.concat(arr);
+                                                        geometry.addGroup(offset, arr.length, matIdx);
+                                                        offset += arr.length;
+                                                }
+                                        });
 
-                    if (total.length > 0) {
-                        geometry.setIndex(new THREE.BufferAttribute(new Uint32Array(total), 1));
-                    }
+                                        if (total.length > 0) {
+                                                geometry.setIndex(new THREE.BufferAttribute(new Uint32Array(total), 1));
+                                        }
 
-                    if (hasAnyNormal) {
-                        geometry.setAttribute("normal", new THREE.BufferAttribute(new Float32Array(outNormals), 3));
-                    } else {
-                        geometry.computeVertexNormals();
-                    }
+                                        if (hasAnyNormal) {
+                                                geometry.setAttribute("normal", new THREE.BufferAttribute(new Float32Array(outNormals), 3));
+                                        } else {
+                                                geometry.computeVertexNormals();
+                                        }
 
-                    return { geometry, materialNames };
-                }
+                                        return { geometry, materialNames };
+                                }
 
                                 async load(path) {
                                         const data = await this.loadJSON(path);
                                         const isKtxModel = path.endsWith("ktx.json");
-                    const result = isKtxModel ? this.createGeometry(data) : this.createGeometryClassic(data);
+                                        const result = isKtxModel ? this.createGeometry(data) : this.createGeometryClassic(data);
                                         const geometry = result.geometry;
                                         const materialNames = result.materialNames || ["default"];
-                    const textureLoader = new THREE.TextureLoader();
-                    const jsonUrl = new URL(path, window.location.href);
+                                        const textureLoader = new THREE.TextureLoader();
+                                        const jsonUrl = new URL(path, window.location.href);
 
-                    // Build materials array from data.material_props
-                    const materials = await Promise.all(materialNames.map(async (name) => {
-                        const props = (data.material_props && data.material_props[name]) || {};
-                        let color = 0x888888;
-                        if (props.Kd) {
-                            const r = Math.min(1, Math.max(0, props.Kd[0]));
-                            const g = Math.min(1, Math.max(0, props.Kd[1]));
-                            const b = Math.min(1, Math.max(0, props.Kd[2]));
-                            color = (Math.round(r * 255) << 16) | (Math.round(g * 255) << 8) | Math.round(b * 255);
-                        }
-                        if (!isKtxModel) {
-                            return new THREE.MeshPhongMaterial({ color, side: THREE.DoubleSide, flatShading: true });
-                        }
+                                        const materials = await Promise.all(materialNames.map(async (name) => {
+                                                const props = (data.material_props && data.material_props[name]) || {};
+                                                let color = 0x888888;
+                                                if (props.Kd) {
+                                                        const r = Math.min(1, Math.max(0, props.Kd[0]));
+                                                        const g = Math.min(1, Math.max(0, props.Kd[1]));
+                                                        const b = Math.min(1, Math.max(0, props.Kd[2]));
+                                                        color = (Math.round(r * 255) << 16) | (Math.round(g * 255) << 8) | Math.round(b * 255);
+                                                }
+                                                if (!isKtxModel) {
+                                                        return new THREE.MeshPhongMaterial({ color, side: THREE.DoubleSide, flatShading: true });
+                                                }
 
-                        const usePBR = props.metallicFactor !== undefined || props.roughnessFactor !== undefined;
-                        const matOpts = {
-                            color,
-                            side: props.doubleSided ? THREE.DoubleSide : THREE.FrontSide,
-                            flatShading: !props.map_Kd,
-                        };
-                        const material = usePBR
-                            ? new THREE.MeshStandardMaterial({
-                                  ...matOpts,
-                                  metalness: props.metallicFactor ?? 0,
-                                  roughness: props.roughnessFactor ?? 1,
-                              })
-                            : new THREE.MeshPhongMaterial(matOpts);
+                                                const usePBR = props.metallicFactor !== undefined || props.roughnessFactor !== undefined;
+                                                const matOpts = {
+                                                        color,
+                                                        side: props.doubleSided ? THREE.DoubleSide : THREE.FrontSide,
+                                                        flatShading: !props.map_Kd,
+                                                };
+                                                const material = usePBR
+                                                        ? new THREE.MeshStandardMaterial({
+                                                                  ...matOpts,
+                                                                  metalness: props.metallicFactor ?? 0,
+                                                                  roughness: props.roughnessFactor ?? 1,
+                                                          })
+                                                        : new THREE.MeshPhongMaterial(matOpts);
 
-                        if (props.map_Kd) {
-                            try {
-                                const textureUrl = new URL(props.map_Kd, jsonUrl).href;
-                                const texture = await new Promise((resolve, reject) => {
-                                    textureLoader.load(textureUrl, resolve, undefined, reject);
-                                });
+                                                if (props.map_Kd) {
+                                                        try {
+                                                                const textureUrl = new URL(props.map_Kd, jsonUrl).href;
+                                                                const texture = await new Promise((resolve, reject) => {
+                                                                        textureLoader.load(textureUrl, resolve, undefined, reject);
+                                                                });
 
-                                if (THREE.SRGBColorSpace && "colorSpace" in texture) {
-                                    texture.colorSpace = THREE.SRGBColorSpace;
-                                } else if (THREE.sRGBEncoding !== undefined) {
-                                    texture.encoding = THREE.sRGBEncoding;
-                                }
+                                                                if (THREE.SRGBColorSpace && "colorSpace" in texture) {
+                                                                        texture.colorSpace = THREE.SRGBColorSpace;
+                                                                } else if (THREE.sRGBEncoding !== undefined) {
+                                                                        texture.encoding = THREE.sRGBEncoding;
+                                                                }
 
-                                texture.flipY = props.map_Kd_flipY === false ? false : true;
-                                material.map = texture;
-                                material.flatShading = false;
-                                material.needsUpdate = true;
-                            } catch (error) {
-                                console.warn(`Failed to load texture for ${name}:`, error);
-                            }
-                        }
+                                                                texture.flipY = props.map_Kd_flipY === false ? false : true;
+                                                                material.map = texture;
+                                                                material.flatShading = false;
+                                                                material.needsUpdate = true;
+                                                        } catch (error) {
+                                                                console.warn(`Failed to load texture for ${name}:`, error);
+                                                        }
+                                                }
 
-                        return material;
-                    }));
+                                                return material;
+                                        }));
 
-                                        // If only one material, pass that; else pass array so groups map to materials
                                         const mesh = new THREE.Mesh(
                                                 geometry,
                                                 materials.length === 1 ? materials[0] : materials,
@@ -458,32 +413,27 @@
                                                 const s = cfg.settings;
                                                 const scene = new THREE.Scene();
 
-                                                // Tùy chỉnh ánh sáng dựa trên tên model
                                                 let ambientIntensity = s.ambientIntensity ?? 2;
                                                 let directIntensity = s.directIntensity ?? 2;
 
                                                 if (cfg.name === "UIT-E") {
-                                                        ambientIntensity = 0.8; // Tăng sáng nền cho model tối
+                                                        ambientIntensity = 0.8;
                                                         directIntensity = 0.4;
                                                 } else if (cfg.name === "BK") {
-                                                        ambientIntensity = 0.6; // Giảm sáng nền để tránh chói
-                                                        directIntensity = 0.7; // Giảm ánh sáng trực tiếp
+                                                        ambientIntensity = 0.6;
+                                                        directIntensity = 0.7;
                                                 } else if (cfg.name === "NongLam-CatTuong") {
-                                                        // Default darker lighting for this model
                                                         ambientIntensity = 0.8;
                                                         directIntensity = 0.8;
-                        } else if (cfg.jsonPath === "ktx.json") {
-                            ambientIntensity = 1;
-                            directIntensity = 1.3;
+                                                } else if (cfg.jsonPath === "ktx.json") {
+                                                        ambientIntensity = 0.5;
+                                                        directIntensity = 1.3;
                                                 }
 
                                                 const ambientLight = new THREE.AmbientLight(0xffffff, ambientIntensity);
                                                 scene.add(ambientLight);
 
-                                                const directionalLight = new THREE.DirectionalLight(
-                                                        0xffffff,
-                                                        directIntensity,
-                                                );
+                                                const directionalLight = new THREE.DirectionalLight(0xffffff, directIntensity);
                                                 directionalLight.position.set(0, -70, 100).normalize();
                                                 scene.add(directionalLight);
 
@@ -497,7 +447,6 @@
                                                         ),
                                                 };
 
-                                                // expose lights and initial intensities for per-model control
                                                 s.ambientIntensity = ambientIntensity;
                                                 s.directIntensity = directIntensity;
                                                 entry.ambientLight = ambientLight;
@@ -510,68 +459,14 @@
                                                         );
                                                 };
 
-                                                // ── Tải JSON model ──
                                                 jsonLoader
                                                         .load(cfg.jsonPath)
                                                         .then((mesh) => {
                                                                 entry.mesh = mesh;
                                                                 scene.add(mesh);
-
-                                                                // ── Tính bounding box thực tế của model ──
-                                                                const box = new THREE.Box3().setFromObject(mesh);
-                                                                const size = new THREE.Vector3();
-                                                                const center = new THREE.Vector3();
-                                                                box.getSize(size);
-                                                                box.getCenter(center);
-
-                                                                console.log(`[${cfg.name}] Bounding box size:`, size);
-                                                                console.log(
-                                                                        `[${cfg.name}] Bounding box center:`,
-                                                                        center,
-                                                                );
-                                                                console.log(
-                                                                        `[${cfg.name}] Min:`,
-                                                                        box.min,
-                                                                        "| Max:",
-                                                                        box.max,
-                                                                );
-                                                                console.log(
-                                                                        `[${cfg.name}] Loaded from JSON: ${cfg.jsonPath}`,
-                                                                );
-
-                                                                entry.debugInfo = {
-                                                                        size: `x=${size.x.toFixed(2)}  y=${size.y.toFixed(2)}  z=${size.z.toFixed(2)}`,
-                                                                        center: `x=${center.x.toFixed(2)}  y=${center.y.toFixed(2)}  z=${center.z.toFixed(2)}`,
-                                                                };
-                                                                const allLines = [
-                                                                        "=== DEBUG: Kích thước model (đơn vị JSON) ===",
-                                                                        "",
-                                                                ];
-                                                                entries.forEach((e, i) => {
-                                                                        if (e.debugInfo) {
-                                                                                allLines.push(
-                                                                                        `── ${MODEL_LIST[i].name} ──`,
-                                                                                );
-                                                                                allLines.push(
-                                                                                        `Size  : ${e.debugInfo.size}`,
-                                                                                );
-                                                                                allLines.push(
-                                                                                        `Center: ${e.debugInfo.center}`,
-                                                                                );
-                                                                                allLines.push("");
-                                                                        }
-                                                                });
-                                                                allLines.push(
-                                                                        "(Xem Console F12 để biết thêm chi tiết)",
-                                                                );
-                                                                updateDebug(allLines);
                                                         })
                                                         .catch((err) => {
                                                                 console.error(`[${cfg.name}] Lỗi tải JSON:`, err);
-                                                                updateDebug([
-                                                                        `❌ Lỗi tải model ${cfg.name}:`,
-                                                                        err.message,
-                                                                ]);
                                                         });
 
                                                 entries.push(entry);
@@ -627,55 +522,6 @@
 
                         map.on("load", () => {
                                 map.addLayer(masterLayer);
-
-                                const gui = new dat.GUI({ width: 300 });
-
-                                entries.forEach((entry, i) => {
-                                        const cfg = MODEL_LIST[i];
-                                        const s = entry.settings;
-
-                                        const folder = gui.addFolder(cfg.name);
-
-                                        const posFolder = folder.addFolder("Vi tri");
-                                        posFolder
-                                                .add(s, "lng", undefined, undefined, 0.00001)
-                                                .name("lng")
-                                                .onChange(() => entry.refreshMercator());
-                                        posFolder
-                                                .add(s, "lat", undefined, undefined, 0.00001)
-                                                .name("lat")
-                                                .onChange(() => entry.refreshMercator());
-                                        posFolder
-                                                .add(s, "altitude", 0, 500, 1)
-                                                .name("altitude (m)")
-                                                .onChange(() => entry.refreshMercator());
-                                        posFolder.open();
-
-                                        const rotFolder = folder.addFolder("Xoay & Ti le");
-                                        rotFolder.add(s, "rotateX", 0, Math.PI * 2, 0.01).name("rotateX");
-                                        rotFolder.add(s, "rotateY", 0, Math.PI * 2, 0.01).name("rotateY");
-                                        rotFolder.add(s, "rotateZ", 0, Math.PI * 2, 0.01).name("rotateZ");
-                                        rotFolder.add(s, "scale", 0.0001, 0.1, 0.0001).name("scale");
-                                        rotFolder.open();
-
-                                        const lightFolder = folder.addFolder("Ánh sáng");
-                                        lightFolder
-                                                .add(s, "ambientIntensity", 0, 10, 0.1)
-                                                .name("Ambient")
-                                                .onChange((v) => {
-                                                        if (entry.ambientLight) entry.ambientLight.intensity = v;
-                                                });
-                                        lightFolder
-                                                .add(s, "directIntensity", 0, 10, 0.1)
-                                                .name("Directional")
-                                                .onChange((v) => {
-                                                        if (entry.directionalLight)
-                                                                entry.directionalLight.intensity = v;
-                                                });
-                                        lightFolder.open();
-
-                                        folder.open();
-                                });
                         });
                 </script>
         </body>
