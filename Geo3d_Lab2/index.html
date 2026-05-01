@@ -31,7 +31,7 @@
                         const MODEL_LIST = [
                                 {
                                         name: "BK",
-                                        jsonPath: "db1ff9eb-9874-44e2-a396-3fba7ea6e59f.json",
+                                        jsonPath: "bk.json",
                                         settings: {
                                                 lng: 106.80250000000001,
                                                 lat: 10.879000000000001,
@@ -45,7 +45,7 @@
 
                                 {
                                         name: "UIT-E",
-                                        jsonPath: "fe3328c6-39e7-4503-ba54-2b16bd3c8102.json",
+                                        jsonPath: "uit-e.json",
                                         settings: {
                                                 lng: 106.80265000000001,
                                                 lat: 10.869900000000001,
@@ -59,7 +59,7 @@
 
                                 {
                                         name: "NongLam-CatTuong",
-                                        jsonPath: "a1cd100f-1ec8-4f45-aba2-227ee4b0d6f0.json",
+                                        jsonPath: "nonglam-cat-tuong.json",
                                         settings: {
                                                 lng: 106.79026,
                                                 lat: 10.87337,
@@ -73,7 +73,7 @@
 
                                 {
                                         name: "KHTN",
-                                        jsonPath: "6ffc3d7e-7a4b-424d-bff5-fae455334095.json",
+                                        jsonPath: "khtn.json",
                                         settings: {
                                                 lng: 106.79508,
                                                 lat: 10.87961,
@@ -89,7 +89,7 @@
 
                                 {
                                         name: "NongLam-HuongDuong",
-                                        jsonPath: "a1cd100f-1ec8-4f45-aba2-227ee4b0d6f1.json",
+                                        jsonPath: "nonglam-huong-duong.json",
                                         settings: {
                                                 lng: 106.79026,
                                                 lat: 10.87366,
@@ -105,7 +105,7 @@
 
                                 {
                                         name: "VienKhoaHocSucKhoe",
-                                        jsonPath: "3dad4455-53e5-4bf7-a10d-02ee778d038c.json",
+                                        jsonPath: "vien-khoa-hoc-suc-khoe.json",
                                         settings: {
                                                 lng: 106.78958,
                                                 lat: 10.87196,
@@ -120,7 +120,7 @@
                                 },
                                 {
                                         name: "Đại học Nông Lâm giảng đường B",
-                                        jsonPath: "98fcfe06-09d8-43b1-8c97-1511d94dfd19.json",
+                                        jsonPath: "nong-lam-giang-duong-b.json",
                                         settings: {
                                                 lng: 106.78934,
                                                 lat: 10.87277,
@@ -136,7 +136,7 @@
 
                                 {
                                         name: "Tòa B4 KTX Khu B",
-                                        jsonPath: "ktx.json",
+                                        jsonPath: "toa-b4-ktx-khu-b.json",
                                         settings: {
                                                 lng: 106.78309,
                                                 lat: 10.88278,
@@ -312,7 +312,7 @@
 
                                 async load(path) {
                                         const data = await this.loadJSON(path);
-                                        const isKtxModel = path.endsWith("ktx.json");
+                                        const isKtxModel = path.endsWith("toa-b4-ktx-khu-b.json");
                                         const result = isKtxModel ? this.createGeometry(data) : this.createGeometryClassic(data);
                                         const geometry = result.geometry;
                                         const materialNames = result.materialNames || ["default"];
@@ -425,7 +425,7 @@
                                                 } else if (cfg.name === "NongLam-CatTuong") {
                                                         ambientIntensity = 0.8;
                                                         directIntensity = 0.8;
-                                                } else if (cfg.jsonPath === "ktx.json") {
+                                                } else if (cfg.jsonPath === "toa-b4-ktx-khu-b.json") {
                                                         ambientIntensity = 0.5;
                                                         directIntensity = 1.3;
                                                 }
